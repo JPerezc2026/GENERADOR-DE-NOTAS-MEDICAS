@@ -545,9 +545,21 @@ async function generarNota(){
     ? 'Es una consulta de PRIMERA VEZ: redacta con el nivel de detalle habitual de una nota completa (padecimiento actual bien desarrollado, análisis clínico razonado).'
     : 'Es una consulta de SEGUIMIENTO: redacta de forma más breve y directa, enfocándote en la evolución respecto a la consulta anterior, sin repetir antecedentes ya conocidos a menos que el médico los mencione.';
 
+  const exploracionBase = `Paciente consciente y orientado(a), neurologicamente integro. Sin datos de deshidratacion aparente en piel y tegumentos, sin cambios de coloracion aparentes. Craneo normocefalo sin deformidades aparentes, pupilas isocoricas normorreflexicas (INR), mucosas hidratadas y normocoloreadas. Cuello cilindrico sin adenopatias cervicales palpables. Torax sin deformidades aparentes, con buena mecanica ventilatoria; a la auscultacion con buena entrada y salida de aire, sin sibilancias ni crepitaciones audibles. Ruidos cardiacos de buen tono y frecuencia, sin soplos audibles. Abdomen blando, depresible, no doloroso a la palpacion en cuadrante superior derecho, Murphy negativo. Ruidos hidroaereos normales en tono y frecuencia. Miembros integros y funcionales, sin datos de acortamiento, tejido celular subcutaneo no infiltrado.`;
+
   const systemPrompt = `Eres un asistente de redacción clínica para un médico mexicano que llena notas en el sistema SiNBA (Sistema de Información de Nacimientos... plataforma de información en salud de la SSA). El médico te da apuntes abreviados de una consulta y tú debes expandirlos a lenguaje médico formal en español, listo para pegar directamente en los campos del formulario.
 
 ${modoTexto}
+
+Plantilla base para "hallazgos_exploracion_fisica" (exploracion fisica normal por sistemas, es la que el medico usa siempre como punto de partida):
+"${exploracionBase}"
+
+Reglas para ese campo específicamente:
+- Usa esta plantilla como base del campo "hallazgos_exploracion_fisica" en TODAS las notas.
+- Modifica ÚNICAMENTE la parte del sistema o aparato relacionado con el padecimiento actual, reemplazando esa oración con el hallazgo anormal que el médico haya dado en sus apuntes (ej. si el padecimiento es respiratorio y el médico dice "sibilancias espiratorias bilaterales", reemplaza solo la oración de tórax/auscultación con eso, dejando el resto de la plantilla igual).
+- Si el médico menciona hallazgos adicionales que no corresponden a ningún sistema de la plantilla (ej. una lesión en piel específica, un hallazgo dermatológico puntual), agrégalos como una oración extra al final, sin quitar nada de la plantilla base.
+- Si el médico no dio ningún hallazgo de exploración física en sus apuntes, usa la plantilla base completa tal cual, sin modificar nada.
+- No repitas la plantilla completa sin ajustar cuando el médico sí dio hallazgos relevantes para algún sistema — ese es el punto de personalizarla.
 
 Reglas importantes:
 - Responde ÚNICAMENTE con un objeto JSON válido, sin texto adicional, sin marcadores de código markdown, sin explicaciones.
